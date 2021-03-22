@@ -1,20 +1,24 @@
-import numpy as np
-import enum
+import arcade
 import Creature
 
-def main():
-    worldSize = 15
-    world = np.zeros(shape = (worldSize, worldSize), dtype = 'int')
+class myWindow (arcade.Window):
+    def __init__(self, width, height, title):
+        super().__init__(width, height, title)
+        self.set_location(400,200)
+        arcade.set_background_color(arcade.color.WHEAT)
 
-    #can be U, D, L, R  (up, down, left, right)
-    direction = "R"
+        self.x = 100
+        self.y = 100
 
-    x = 5
-    y = 5
-        
-    animat = Creature.Creature(x,y)
-    animat.getPosition()
-    animat.move(worldSize, direction)
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_circle_filled(self.x, self.y, 5, arcade.color.BLUE_GREEN)
 
-if __name__ == "__main__":
-    main()
+    def on_update(self, delta_time):
+        self.x += 1
+        self.y += 1
+
+worldSize = 500
+myWindow(worldSize, worldSize, "Test")
+
+arcade.run()
