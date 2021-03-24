@@ -5,7 +5,7 @@ class Creature(object):
         self.x = x
         self.y = y
         self.energy = 200
-        self.viewDistance = 100
+        self.viewDistance = 50
         self.direction = 'R'
         self.foraging = False
 

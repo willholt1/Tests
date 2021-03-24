@@ -61,12 +61,14 @@ class myWindow (arcade.Window):
             #check if can eat any food
             for j in range (len(self.food)):
                 distance = math.sqrt( (self.food[j].x - self.creatures[i].x)**2 + (self.food[j].y - self.creatures[i].y)**2 )
+                #if food is close, eat
                 if (distance <= 10):
                     print('Creature {} Chomps'.format(i))
                     self.creatures[i].eat(self.food[j])
                     del self.food[j]
                     self.creatures[i].foraging = False
                     break
+                #if no food spotted, look for food
                 elif (self.creatures[i].foraging == False):
                     self.creatures[i].look(self.food[j])
             
