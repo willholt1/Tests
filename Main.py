@@ -14,7 +14,11 @@ class myWindow (arcade.Window):
 
         self.worldSize = width
         
+        #number of creatures
         population = 10
+        
+        #density in which the clumps of food spawn
+        foodDensity = 20
         
         #how far from the edge of the screen entities must spawn
         spawnBorder = 15
@@ -29,11 +33,14 @@ class myWindow (arcade.Window):
 
         #create food
         self.food = []
-        for i in range(population * 20):
+        for i in range(population * 2):
             x = random.randint(spawnBorder, (self.worldSize - spawnBorder))
             y = random.randint(spawnBorder, (self.worldSize - spawnBorder))
-            plant = Food.Food(x,y)
-            self.food.append(plant)
+            for j in range(random.randint(2, 7)):
+                x = x + random.randint(-foodDensity,foodDensity)
+                y = y + random.randint(-foodDensity,foodDensity)
+                plant = Food.Food(x,y)
+                self.food.append(plant)
 
     def on_draw(self):
         arcade.start_render()
@@ -47,27 +54,27 @@ class myWindow (arcade.Window):
 
     def on_update(self, delta_time):
         for i in range(len(self.creatures)):
-            #move the creatures in a random direction
-            ranNum = random.randint(1,4)
-            if ranNum == 1:
-                direction = 'U'
-            elif ranNum == 2:
-                direction = 'D'
-            elif ranNum == 3:
-                direction = 'L'
-            elif ranNum == 4:
-                direction = 'R'
 
-            self.creatures[i].move(self.worldSize, direction)
+
+            self.creatures[i].move(self.worldSize)
 
             #check if can eat any food
             for j in range (len(self.food)):
                 distance = math.sqrt( (self.food[j].x - self.creatures[i].x)**2 + (self.food[j].y - self.creatures[i].y)**2 )
-                if distance <= 10:
-                    print('Chomp')
+                if (distance <= 10):
+                    print('Creature {} Chomps'.format(i))
                     self.creatures[i].eat(self.food[j])
                     del self.food[j]
+                    self.creatures[i].foraging = False
                     break
+                elif (self.creatures[i].foraging == False):
+                    self.creatures[i].look(self.food[j])
+            
+            #creatures die if they run out of energy 
+            if (self.creatures[i].energy <= 0):
+                del self.creatures[i]
+                print ('dead')
+                break
 
 def main():
     worldSize = 500
