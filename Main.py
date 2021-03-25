@@ -55,7 +55,6 @@ class myWindow (arcade.Window):
     def on_update(self, delta_time):
         for i in range(len(self.creatures)):
 
-
             self.creatures[i].move(self.worldSize)
 
             #check if can eat any food

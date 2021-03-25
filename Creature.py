@@ -1,13 +1,15 @@
 import Food
+import random
 
 class Creature(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.energy = 200
-        self.viewDistance = 50
+        self.viewDistance = random.randint(50,100)
         self.direction = 'R'
         self.foraging = False
+        self.fitness = 0
 
     def move(self, worldSize):
 
@@ -22,11 +24,12 @@ class Creature(object):
                 self.x += 1
 
             self.energy -= 1
+            self.fitness += 1
     
     def eat(self, food):
         #increase energy by nutrition value of the food
         self.energy += food.nutrition
-        print("Energy = {}".format(self.energy))
+        print('Energy = {}  ViewDistance = {}  Fitness = {}'.format(self.energy, self.viewDistance, self.fitness))
 
     def look(self, food):
         if ((self.y <= food.y <= (self.y + self.viewDistance)) and ((self.x - 5) <= food.x <= (self.x + 5))):
