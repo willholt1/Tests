@@ -15,32 +15,37 @@ class myWindow (arcade.Window):
         self.worldSize = width
         
         #number of creatures
-        population = 10
+        population = 2
         
-        #density in which the clumps of food spawn
-        foodDensity = 20
+        #food spawn variables
+        self.foodDensity = 15
+        foodMultiplier = 16
         
         #how far from the edge of the screen entities must spawn
-        spawnBorder = 15
+        self.spawnBorder = 50
 
         #create creatures
         self.creatures = []
         for i in range(population):
-            x = random.randint(spawnBorder, (self.worldSize - spawnBorder))
-            y = random.randint(spawnBorder, (self.worldSize - spawnBorder))
+            x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
+            y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
             animat = Creature.Creature(x,y)
             self.creatures.append(animat)
 
         #create food
         self.food = []
-        for i in range(population * 2):
-            x = random.randint(spawnBorder, (self.worldSize - spawnBorder))
-            y = random.randint(spawnBorder, (self.worldSize - spawnBorder))
-            for j in range(random.randint(2, 7)):
-                x = x + random.randint(-foodDensity,foodDensity)
-                y = y + random.randint(-foodDensity,foodDensity)
-                plant = Food.Food(x,y)
-                self.food.append(plant)
+        for i in range(population * foodMultiplier):
+            self.replenishFood()
+
+    #create food clumps
+    def replenishFood(self):
+        x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
+        y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
+        for j in range(random.randint(2, 7)):
+            x = x + random.randint(-self.foodDensity,self.foodDensity)
+            y = y + random.randint(-self.foodDensity,self.foodDensity)
+            plant = Food.Food(x,y)
+            self.food.append(plant)
 
     def on_draw(self):
         arcade.start_render()
@@ -53,29 +58,30 @@ class myWindow (arcade.Window):
             arcade.draw_circle_filled(self.food[i].x, self.food[i].y, 5, arcade.color.GO_GREEN)
 
     def on_update(self, delta_time):
+        #2% chance more food is generated
+        if (random.randint(0,100) < 2):
+            self.replenishFood()
+
         for i in range(len(self.creatures)):
 
+            #move the creatures
             self.creatures[i].move(self.worldSize)
 
-            #check if can eat any food
-            for j in range (len(self.food)):
-                distance = math.sqrt( (self.food[j].x - self.creatures[i].x)**2 + (self.food[j].y - self.creatures[i].y)**2 )
-                #if food is close, eat
-                if (distance <= 10):
-                    print('Creature {} Chomps'.format(i))
-                    self.creatures[i].eat(self.food[j])
-                    del self.food[j]
-                    self.creatures[i].foraging = False
-                    break
-                #if no food spotted, look for food
-                elif (self.creatures[i].foraging == False):
-                    self.creatures[i].look(self.food[j])
-            
-            #creatures die if they run out of energy 
+            #check if any food is close enough to eat, if so eat it
+            self.food = self.creatures[i].checkEat(self.food)
+
+            #creatures die if they run out of energy and reproduce if they meet a threshold
+            #reproduction costs 300 energy
             if (self.creatures[i].energy <= 0):
-                del self.creatures[i]
                 print ('dead')
+                self.creatures[i].getInfo()
+                del self.creatures[i]
                 break
+            elif (self.creatures[i].energy > 600):
+                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y)
+                self.creatures.append(animat)
+                self.creatures[i].energy -= 300
+                self.creatures[i].children += 1
 
 def main():
     worldSize = 500
