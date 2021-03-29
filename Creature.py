@@ -3,7 +3,7 @@ import random
 import math
 
 class Creature(object):
-    def __init__(self, x, y):
+    def __init__(self, x, y, baseEnergy = None, viewDistance = None, movementEfficiency = None):
         #position
         self.x = x
         self.y = y
@@ -12,16 +12,40 @@ class Creature(object):
         self.foraging = False
         
         #performance stats
-        self.fitness = 0
+        self.distanceTravelled = 0
         self.foodEaten = 0 
         self.freeMoves = 0
         self.children = 0
 
+        if (baseEnergy is None):
+            self.createValues()
+        elif (random.randint(0,100) < 50):
+            creatureProperties = [baseEnergy, viewDistance, movementEfficiency]
+            i = random.randint(0,2)
+            
+            mutation = random.randint(0,creatureProperties[i])
+            creatureProperties[i] -= mutation
+            i = random.randint(0,2)
+            creatureProperties[i] += mutation
+
+            self.baseEnergy = creatureProperties[0]
+            self.energy = self.baseEnergy
+            self.viewDistance = creatureProperties[1]
+            self.movementEfficiency = creatureProperties[2]
+
+        else:
+            self.baseEnergy = baseEnergy
+            self.energy = baseEnergy
+            self.viewDistance = viewDistance
+            self.movementEfficiency = movementEfficiency
+
+
+    def createValues(self):
         #skill distribution
-        energyPool = 500
-        a = random.randint(0, energyPool)
+        energyPool = 750
+        a = random.randint(1, energyPool)
         energyPool -= a
-        b = random.randint(0, energyPool)
+        b = random.randint(1, energyPool)
         c = energyPool -b
 
         self.baseEnergy = a
@@ -34,16 +58,16 @@ class Creature(object):
         if (self.energy > 0):
             if (self.direction == 'U' and self.y < (worldSize-1)):
                 self.y += 1
-                self.fitness += 1
+                self.distanceTravelled += 1
             elif (self.direction == 'D' and self.y > 1):
                 self.y -= 1
-                self.fitness += 1
+                self.distanceTravelled += 1
             elif (self.direction == 'L' and self.x > 1):
                 self.x -= 1
-                self.fitness += 1
+                self.distanceTravelled += 1
             elif (self.direction == 'R' and self.x < (worldSize-1)):
                 self.x += 1
-                self.fitness += 1
+                self.distanceTravelled += 1
 
             if (self.movementEfficiency < random.randint(0, (self.movementEfficiency + 100))):
                 self.energy -= 1
@@ -89,20 +113,25 @@ class Creature(object):
     def getInfo(self):
         print ('Energy = {} \n \
                 BaseEnergy = {} \n \
-                FoodEaten = {} \n \
                 ViewDistance = {} \n \
                 MovementEfficiency = {} \n \
+                FoodEaten = {} \n \
+                DistanceTravelled = {} \n \
                 FreeMoves = {} \n \
                 Children = {} \n \
                 Fitness = {}'\
                 .format(self.energy,\
                         self.baseEnergy,\
-                        self.foodEaten,\
                         self.viewDistance,\
                         self.movementEfficiency,\
+                        self.foodEaten,\
+                        self.distanceTravelled,\
                         self.freeMoves,\
                         self.children,\
-                        self.fitness))
+                        (self.foodEaten / self.distanceTravelled)))
+    
+    def getFitness(self):
+        print(self.foodEaten * self.distanceTravelled)
 
     def getPosition(self):
        print('x = {} & y = {}'.format(self.x, self.y))

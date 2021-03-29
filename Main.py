@@ -15,7 +15,7 @@ class myWindow (arcade.Window):
         self.worldSize = width
         
         #number of creatures
-        population = 2
+        population = 10
         
         #food spawn variables
         self.foodDensity = 15
@@ -59,7 +59,7 @@ class myWindow (arcade.Window):
 
     def on_update(self, delta_time):
         #2% chance more food is generated
-        if (random.randint(0,100) < 2):
+        if (random.randint(0,100) < 3):
             self.replenishFood()
 
         for i in range(len(self.creatures)):
@@ -73,18 +73,18 @@ class myWindow (arcade.Window):
             #creatures die if they run out of energy and reproduce if they meet a threshold
             #reproduction costs 300 energy
             if (self.creatures[i].energy <= 0):
-                print ('dead')
-                self.creatures[i].getInfo()
+                #print ('dead')
+                self.creatures[i].getFitness()
                 del self.creatures[i]
                 break
             elif (self.creatures[i].energy > 600):
-                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y)
+                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y, self.creatures[i].baseEnergy, self.creatures[i].viewDistance, self.creatures[i].movementEfficiency)
                 self.creatures.append(animat)
                 self.creatures[i].energy -= 300
                 self.creatures[i].children += 1
 
 def main():
-    worldSize = 500
+    worldSize = 750
     win = myWindow(worldSize, worldSize, 'Test')
 
     arcade.run()
