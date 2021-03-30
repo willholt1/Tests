@@ -3,13 +3,15 @@ import random
 import math
 
 class Creature(object):
-    def __init__(self, x, y, baseEnergy = None, viewDistance = None, movementEfficiency = None):
+    def __init__(self, x, y, baseEnergy = None, viewDistance = None, movementEfficiency = None, speed = None):
         #position
         self.x = x
         self.y = y
         
         self.direction = 'R'
         self.foraging = False
+
+        mutationRate = 75
         
         #performance stats
         self.distanceTravelled = 0
@@ -19,25 +21,30 @@ class Creature(object):
 
         if (baseEnergy is None):
             self.createValues()
-        elif (random.randint(0,100) < 50):
-            creatureProperties = [baseEnergy, viewDistance, movementEfficiency]
-            i = random.randint(0,2)
-            
-            mutation = random.randint(0,creatureProperties[i])
-            creatureProperties[i] -= mutation
-            i = random.randint(0,2)
-            creatureProperties[i] += mutation
-
-            self.baseEnergy = creatureProperties[0]
-            self.energy = self.baseEnergy
-            self.viewDistance = creatureProperties[1]
-            self.movementEfficiency = creatureProperties[2]
+        elif (random.randint(0,100) < mutationRate):
+            self.mutate(baseEnergy, viewDistance, movementEfficiency, speed)
 
         else:
             self.baseEnergy = baseEnergy
             self.energy = baseEnergy
             self.viewDistance = viewDistance
             self.movementEfficiency = movementEfficiency
+            self.speed = speed
+
+    def mutate(self, baseEnergy, viewDistance, movementEfficiency, speed):
+        creatureProperties = [baseEnergy, viewDistance, movementEfficiency]
+        i = random.randint(0,2)
+
+        mutation = random.randint(0, round(creatureProperties[i]/6))
+        creatureProperties[i] -= mutation
+        i = random.randint(0,2)
+        creatureProperties[i] += mutation
+
+        self.baseEnergy = creatureProperties[0]
+        self.energy = self.baseEnergy
+        self.viewDistance = creatureProperties[1]
+        self.movementEfficiency = creatureProperties[2]
+        self.speed = speed
 
 
     def createValues(self):
@@ -53,20 +60,22 @@ class Creature(object):
         self.viewDistance = b
         self.movementEfficiency = c
 
+        self.speed = 1 #random.randint(1,2)
+
     def move(self, worldSize):
 
         if (self.energy > 0):
             if (self.direction == 'U' and self.y < (worldSize-1)):
-                self.y += 1
+                self.y += self.speed
                 self.distanceTravelled += 1
             elif (self.direction == 'D' and self.y > 1):
-                self.y -= 1
+                self.y -= self.speed
                 self.distanceTravelled += 1
             elif (self.direction == 'L' and self.x > 1):
-                self.x -= 1
+                self.x -= self.speed
                 self.distanceTravelled += 1
             elif (self.direction == 'R' and self.x < (worldSize-1)):
-                self.x += 1
+                self.x += self.speed
                 self.distanceTravelled += 1
 
             if (self.movementEfficiency < random.randint(0, (self.movementEfficiency + 100))):
@@ -131,7 +140,8 @@ class Creature(object):
                         (self.foodEaten / self.distanceTravelled)))
     
     def getFitness(self):
-        print(self.foodEaten * self.distanceTravelled)
+        fitness = (self.foodEaten + 1) * self.distanceTravelled
+        print(fitness)
 
     def getPosition(self):
        print('x = {} & y = {}'.format(self.x, self.y))

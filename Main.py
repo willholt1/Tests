@@ -15,11 +15,11 @@ class myWindow (arcade.Window):
         self.worldSize = width
         
         #number of creatures
-        population = 10
+        population = 50
         
         #food spawn variables
         self.foodDensity = 15
-        foodMultiplier = 16
+        foodMultiplier = 1
         
         #how far from the edge of the screen entities must spawn
         self.spawnBorder = 50
@@ -59,7 +59,7 @@ class myWindow (arcade.Window):
 
     def on_update(self, delta_time):
         #2% chance more food is generated
-        if (random.randint(0,100) < 3):
+        if (random.randint(0,100) < 10):
             self.replenishFood()
 
         for i in range(len(self.creatures)):
@@ -78,7 +78,7 @@ class myWindow (arcade.Window):
                 del self.creatures[i]
                 break
             elif (self.creatures[i].energy > 600):
-                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y, self.creatures[i].baseEnergy, self.creatures[i].viewDistance, self.creatures[i].movementEfficiency)
+                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y, self.creatures[i].baseEnergy, self.creatures[i].viewDistance, self.creatures[i].movementEfficiency, self.creatures[i].speed)
                 self.creatures.append(animat)
                 self.creatures[i].energy -= 300
                 self.creatures[i].children += 1
