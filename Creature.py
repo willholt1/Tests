@@ -1,13 +1,13 @@
 import Food
 import random
 import math
+import arcade
 
-class Creature(object):
-    def __init__(self, x, y, baseEnergy = None, viewDistance = None, movementEfficiency = None, speed = None):
-        #position
-        self.x = x
-        self.y = y
-        
+class Creature(arcade.Sprite):
+    def __init__(self, image, baseEnergy = None, viewDistance = None, movementEfficiency = None, speed = None):
+
+        super().__init__(image, 0.5)
+
         self.direction = 'R'
         self.foraging = False
 
@@ -65,17 +65,17 @@ class Creature(object):
     def move(self, worldSize):
 
         if (self.energy > 0):
-            if (self.direction == 'U' and self.y < (worldSize-1)):
-                self.y += self.speed
+            if (self.direction == 'U' and self.center_y < (worldSize-1)):
+                self.center_y += self.speed
                 self.distanceTravelled += 1
-            elif (self.direction == 'D' and self.y > 1):
-                self.y -= self.speed
+            elif (self.direction == 'D' and self.center_y > 1):
+                self.center_y -= self.speed
                 self.distanceTravelled += 1
-            elif (self.direction == 'L' and self.x > 1):
-                self.x -= self.speed
+            elif (self.direction == 'L' and self.center_x > 1):
+                self.center_x -= self.speed
                 self.distanceTravelled += 1
-            elif (self.direction == 'R' and self.x < (worldSize-1)):
-                self.x += self.speed
+            elif (self.direction == 'R' and self.center_x < (worldSize-1)):
+                self.center_x += self.speed
                 self.distanceTravelled += 1
 
             if (self.movementEfficiency < random.randint(0, (self.movementEfficiency + 100))):
@@ -86,11 +86,11 @@ class Creature(object):
     def checkEat(self, food):
         #check if can eat any food
         for i in range (len(food)):
-            distance = math.sqrt( (food[i].center_x - self.x)**2 + (food[i].center_y - self.y)**2 )
+            eaten = arcade.check_for_collision(self, food[i])
             #if food is close, eat
-            if (distance <= 10):
+            if (eaten):
                 self.eat(food[i])
-                food.remove(food[i])
+                food[i].remove_from_sprite_lists()
                 self.foraging = False
                 break
             #if no food spotted, look for food                
@@ -104,16 +104,16 @@ class Creature(object):
         self.foodEaten += 1
 
     def look(self, food):
-        if ((self.y <= food.center_y <= (self.y + self.viewDistance)) and ((self.x - 5) <= food.center_x <= (self.x + 5))):
+        if ((self.center_y <= food.center_y <= (self.center_y + self.viewDistance)) and ((self.center_x - 5) <= food.center_x <= (self.center_x + 5))):
             self.direction = 'U'
             self.foraging = True
-        elif (((self.y - self.viewDistance) <= food.center_y <= self.y) and ((self.x - 5) <= food.center_x <= (self.x + 5))):
+        elif (((self.center_y - self.viewDistance) <= food.center_y <= self.center_y) and ((self.center_x - 5) <= food.center_x <= (self.center_x + 5))):
             self.direction = 'D'
             self.foraging = True
-        elif (((self.x - self.viewDistance) <= food.center_x <= self.x) and ((self.y - 5) <= food.center_y <= (self.y + 5))):
+        elif (((self.center_x - self.viewDistance) <= food.center_x <= self.center_x) and ((self.center_y - 5) <= food.center_y <= (self.center_y + 5))):
             self.direction = 'L'
             self.foraging = True
-        elif ((self.x <= food.center_x <= (self.x + self.viewDistance)) and ((self.y - 5) <= food.center_y <= (self.y + 5))):
+        elif ((self.center_x <= food.center_x <= (self.center_x + self.viewDistance)) and ((self.center_y - 5) <= food.center_y <= (self.center_y + 5))):
             self.direction = 'R'
             self.foraging = True
         else:

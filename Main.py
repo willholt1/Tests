@@ -14,21 +14,22 @@ class myWindow (arcade.Window):
         self.worldSize = width
         
         #number of creatures
-        population = 50
+        population = 10
         
         #food spawn variables
-        self.foodDensity = 15
+        self.foodDensity = 20
         foodMultiplier = 1
         
         #how far from the edge of the screen entities must spawn
         self.spawnBorder = 50
 
         #create creatures
-        self.creatures = []
+        self.creatures = arcade.SpriteList()
         for i in range(population):
-            x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
-            y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
-            animat = Creature.Creature(x,y)
+            animat = Creature.Creature("sprites/creature_blue.png")
+            animat.center_x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
+            animat.center_y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
+            
             self.creatures.append(animat)
 
         #create food
@@ -40,7 +41,7 @@ class myWindow (arcade.Window):
     def replenishFood(self):
         x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
         y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
-        for j in range(random.randint(2, 7)):
+        for j in range(random.randint(1, 6)):
             foodSprite = Food("sprites/plant.png")
             foodSprite.center_x = x + random.randint(-self.foodDensity,self.foodDensity)
             foodSprite.center_y = y + random.randint(-self.foodDensity,self.foodDensity)
@@ -49,16 +50,14 @@ class myWindow (arcade.Window):
     def on_draw(self):
         arcade.start_render()
         #render creatures
-        for i in range(len(self.creatures)):
-            arcade.draw_circle_filled(self.creatures[i].x, self.creatures[i].y, 5, arcade.color.BLUE_GREEN)
-        
+        self.creatures.draw()
         #render food
         self.foodList.draw()
         
 
     def on_update(self, delta_time):
         #2% chance more food is generated
-        if (random.randint(0,100) < 10):
+        if (random.randint(0,100) < 2):
             self.replenishFood()
 
         for i in range(len(self.creatures)):
@@ -74,10 +73,12 @@ class myWindow (arcade.Window):
             if (self.creatures[i].energy <= 0):
                 #print ('dead')
                 self.creatures[i].getFitness()
-                del self.creatures[i]
+                self.creatures.remove(self.creatures[i])
                 break
             elif (self.creatures[i].energy > 600):
-                animat = Creature.Creature(self.creatures[i].x, self.creatures[i].y, self.creatures[i].baseEnergy, self.creatures[i].viewDistance, self.creatures[i].movementEfficiency, self.creatures[i].speed)
+                animat = Creature.Creature("sprites/creature_blue.png", self.creatures[i].baseEnergy, self.creatures[i].viewDistance, self.creatures[i].movementEfficiency, self.creatures[i].speed)
+                animat.center_x = self.creatures[i].center_x
+                animat.center_y = self.creatures[i].center_y
                 self.creatures.append(animat)
                 self.creatures[i].energy -= 300
                 self.creatures[i].children += 1

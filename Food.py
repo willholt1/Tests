@@ -8,4 +8,4 @@ class Food(arcade.Sprite):
         self.nutrition = 15
 
     def getPosition(self):
-       print('x = {} & y = {}'.format(self.x, self.y))
+       print('x = {} & y = {}'.format(self.center_x, self.center_y))
