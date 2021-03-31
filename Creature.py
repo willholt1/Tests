@@ -3,15 +3,20 @@ import random
 import math
 import arcade
 
+#CONSTANTS
+UP = 0
+DOWN = 180
+LEFT = 90
+RIGHT = 270
+MUTATION_RATE = 75
+
 class Creature(arcade.Sprite):
     def __init__(self, image, baseEnergy = None, viewDistance = None, movementEfficiency = None, speed = None):
 
         super().__init__(image, 0.5)
 
-        self.direction = 'R'
+        self.direction = 'U'
         self.foraging = False
-
-        mutationRate = 75
         
         #performance stats
         self.distanceTravelled = 0
@@ -21,9 +26,8 @@ class Creature(arcade.Sprite):
 
         if (baseEnergy is None):
             self.createValues()
-        elif (random.randint(0,100) < mutationRate):
+        elif (random.randint(0,100) < MUTATION_RATE):
             self.mutate(baseEnergy, viewDistance, movementEfficiency, speed)
-
         else:
             self.baseEnergy = baseEnergy
             self.energy = baseEnergy
@@ -107,17 +111,22 @@ class Creature(arcade.Sprite):
         if ((self.center_y <= food.center_y <= (self.center_y + self.viewDistance)) and ((self.center_x - 5) <= food.center_x <= (self.center_x + 5))):
             self.direction = 'U'
             self.foraging = True
+            self.angle = UP
         elif (((self.center_y - self.viewDistance) <= food.center_y <= self.center_y) and ((self.center_x - 5) <= food.center_x <= (self.center_x + 5))):
             self.direction = 'D'
             self.foraging = True
+            self.angle = DOWN
         elif (((self.center_x - self.viewDistance) <= food.center_x <= self.center_x) and ((self.center_y - 5) <= food.center_y <= (self.center_y + 5))):
             self.direction = 'L'
             self.foraging = True
+            self.angle = LEFT
         elif ((self.center_x <= food.center_x <= (self.center_x + self.viewDistance)) and ((self.center_y - 5) <= food.center_y <= (self.center_y + 5))):
             self.direction = 'R'
             self.foraging = True
+            self.angle = RIGHT
         else:
             self.foraging = False
+        
 
     def getInfo(self):
         print ('Energy = {} \n \
