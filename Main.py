@@ -4,8 +4,7 @@ import math
 
 #classes
 import Creature
-import Food
-
+from Food import Food
 
 class myWindow (arcade.Window):
     def __init__(self, width, height, title):
@@ -33,7 +32,7 @@ class myWindow (arcade.Window):
             self.creatures.append(animat)
 
         #create food
-        self.food = []
+        self.foodList = arcade.SpriteList()
         for i in range(population * foodMultiplier):
             self.replenishFood()
 
@@ -42,10 +41,10 @@ class myWindow (arcade.Window):
         x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
         y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
         for j in range(random.randint(2, 7)):
-            x = x + random.randint(-self.foodDensity,self.foodDensity)
-            y = y + random.randint(-self.foodDensity,self.foodDensity)
-            plant = Food.Food(x,y)
-            self.food.append(plant)
+            foodSprite = Food("sprites/plant.png")
+            foodSprite.center_x = x + random.randint(-self.foodDensity,self.foodDensity)
+            foodSprite.center_y = y + random.randint(-self.foodDensity,self.foodDensity)
+            self.foodList.append(foodSprite)
 
     def on_draw(self):
         arcade.start_render()
@@ -54,8 +53,8 @@ class myWindow (arcade.Window):
             arcade.draw_circle_filled(self.creatures[i].x, self.creatures[i].y, 5, arcade.color.BLUE_GREEN)
         
         #render food
-        for i in range(len(self.food)):
-            arcade.draw_circle_filled(self.food[i].x, self.food[i].y, 5, arcade.color.GO_GREEN)
+        self.foodList.draw()
+        
 
     def on_update(self, delta_time):
         #2% chance more food is generated
@@ -68,7 +67,7 @@ class myWindow (arcade.Window):
             self.creatures[i].move(self.worldSize)
 
             #check if any food is close enough to eat, if so eat it
-            self.food = self.creatures[i].checkEat(self.food)
+            self.foodList = self.creatures[i].checkEat(self.foodList)
 
             #creatures die if they run out of energy and reproduce if they meet a threshold
             #reproduction costs 300 energy

@@ -1,7 +1,10 @@
-class Food(object):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+import arcade
+
+class Food(arcade.Sprite):
+    def __init__(self, image):
+        
+        super().__init__(image, 0.5)
+
         self.nutrition = 15
 
     def getPosition(self):

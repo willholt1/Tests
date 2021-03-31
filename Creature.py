@@ -86,11 +86,11 @@ class Creature(object):
     def checkEat(self, food):
         #check if can eat any food
         for i in range (len(food)):
-            distance = math.sqrt( (food[i].x - self.x)**2 + (food[i].y - self.y)**2 )
+            distance = math.sqrt( (food[i].center_x - self.x)**2 + (food[i].center_y - self.y)**2 )
             #if food is close, eat
             if (distance <= 10):
                 self.eat(food[i])
-                del food[i]
+                food.remove(food[i])
                 self.foraging = False
                 break
             #if no food spotted, look for food                
@@ -104,16 +104,16 @@ class Creature(object):
         self.foodEaten += 1
 
     def look(self, food):
-        if ((self.y <= food.y <= (self.y + self.viewDistance)) and ((self.x - 5) <= food.x <= (self.x + 5))):
+        if ((self.y <= food.center_y <= (self.y + self.viewDistance)) and ((self.x - 5) <= food.center_x <= (self.x + 5))):
             self.direction = 'U'
             self.foraging = True
-        elif (((self.y - self.viewDistance) <= food.y <= self.y) and ((self.x - 5) <= food.x <= (self.x + 5))):
+        elif (((self.y - self.viewDistance) <= food.center_y <= self.y) and ((self.x - 5) <= food.center_x <= (self.x + 5))):
             self.direction = 'D'
             self.foraging = True
-        elif (((self.x - self.viewDistance) <= food.x <= self.x) and ((self.y - 5) <= food.y <= (self.y + 5))):
+        elif (((self.x - self.viewDistance) <= food.center_x <= self.x) and ((self.y - 5) <= food.center_y <= (self.y + 5))):
             self.direction = 'L'
             self.foraging = True
-        elif ((self.x <= food.x <= (self.x + self.viewDistance)) and ((self.y - 5) <= food.y <= (self.y + 5))):
+        elif ((self.x <= food.center_x <= (self.x + self.viewDistance)) and ((self.y - 5) <= food.center_y <= (self.y + 5))):
             self.direction = 'R'
             self.foraging = True
         else:
