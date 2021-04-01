@@ -5,7 +5,7 @@ class Food(arcade.Sprite):
         
         super().__init__(image, 0.5)
 
-        self.nutrition = 15
+        self.energy = 50
 
     def getPosition(self):
        print('x = {} & y = {}'.format(self.center_x, self.center_y))
