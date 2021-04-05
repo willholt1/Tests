@@ -163,7 +163,8 @@ class Creature(arcade.Sprite):
                         ((self.foodEaten + 1) * self.distanceTravelled)))
     
     def getFitness(self):
-        fitness = (self.foodEaten + 1) * self.distanceTravelled
+        #fitness = (self.foodEaten + 1) * self.distanceTravelled
+        fitness = self.foodEaten
         print(fitness)
         if (self.speed == 1):
             f = open('dataOutput/HerbivoreStat.txt', 'a+')

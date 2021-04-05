@@ -4,7 +4,7 @@ import math
 import os
 #classes
 import Creature
-from Food import Food
+import Food
 
 class myWindow (arcade.Window):
     def __init__(self, width, height, title):
@@ -12,7 +12,10 @@ class myWindow (arcade.Window):
         arcade.set_background_color(arcade.color.WHEAT)
 
         self.worldSize = width
+        self.startup()
         
+
+    def startup(self):
         #number of creatures
         population = 100
         
@@ -25,7 +28,7 @@ class myWindow (arcade.Window):
 
         #create herbivores
         self.herbivores = arcade.SpriteList()
-        for i in range(round(population * 0.95)):
+        for i in range(round(population * 0.9)):
             animat = Creature.Creature('sprites/creature_blue.png', 1)
             animat.center_x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
             animat.center_y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
@@ -51,26 +54,41 @@ class myWindow (arcade.Window):
         x = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
         y = random.randint(self.spawnBorder, (self.worldSize - self.spawnBorder))
         for j in range(random.randint(1, 6)):
-            foodSprite = Food('sprites/plant.png')
+            foodSprite = Food.Food('sprites/plant.png')
             foodSprite.center_x = x + random.randint(-self.foodDensity,self.foodDensity)
             foodSprite.center_y = y + random.randint(-self.foodDensity,self.foodDensity)
             self.foodList.append(foodSprite)
 
     def on_draw(self):
+
         arcade.start_render()
+        #render food
+        self.foodList.draw()
         #render herbivores
         self.herbivores.draw()
         #render predators
         self.predators.draw()
-        #render food
-        self.foodList.draw()
+        
+        
+        #population counters
+        arcade.draw_text("Food Count:    {}".format(len(self.foodList)), 5, 5, arcade.color.BLACK, 12)
+        arcade.draw_text("H Population:  {}".format(len(self.herbivores)), 5, 20, arcade.color.BLACK, 12)
+        arcade.draw_text("P Population:  {}".format(len(self.predators)), 5, 35, arcade.color.BLACK, 12)
         
 
     def on_update(self, delta_time):
         #chance more food is generated. if more creatures, greater chance for food to be generated
-        if (random.randint(0,100) < (50 - len(self.herbivores))):
+        if ((random.randint(0,100) < (30 - round(len(self.herbivores)/4))) and (len(self.foodList) < 500)):
             self.replenishFood()
 
+        self.updatePredators()
+
+        self.updateHerbivores()
+
+        if ((len(self.herbivores) == 0) or (len(self.predators) == 0)):
+            self.startup()
+
+    def updatePredators(self):
         for i in range(len(self.predators)):
             self.predators[i].move(self.worldSize)
 
@@ -82,9 +100,10 @@ class myWindow (arcade.Window):
             if (self.predators[i].energy <= 0):
                 self.die(self.predators[i])
                 break
-            elif (self.predators[i].energy > 450):
+            elif (self.predators[i].energy > 1200):
                 self.reproduce(self.predators[i])
-
+                
+    def updateHerbivores(self):
         for i in range(len(self.herbivores)):
             #move the creatures
             self.herbivores[i].move(self.worldSize)
@@ -99,7 +118,6 @@ class myWindow (arcade.Window):
                 break
             elif (self.herbivores[i].energy > 450):
                 self.reproduce(self.herbivores[i])
-                
     
     def die(self, creature):
         creature.getFitness()
@@ -121,11 +139,12 @@ class myWindow (arcade.Window):
                                     creature.movementEfficiency)
         animat.center_x = creature.center_x
         animat.center_y = creature.center_y
-        creature.energy -= 300
         creature.children += 1
         if (creature.speed == 1):
+            creature.energy -= 300
             self.herbivores.append(animat)
         else:
+            creature.energy -= 600
             self.predators.append(animat)
 
 
@@ -133,9 +152,14 @@ def main():
     worldSize = 800
     win = myWindow(worldSize, worldSize, 'Test')
 
+    os.remove('dataOutput/HerbivoreStat.txt')
+    os.remove('dataOutput/PredatorStat.txt')
+    f = open('dataOutput/HerbivoreStat.txt', 'a+')
+    f.close()
+    f = open('dataOutput/PredatorStat.txt', 'a+')
+    f.close()
+
     arcade.run()
 
 if __name__ == '__main__':
-    os.remove('dataOutput/HerbivoreStat.txt')
-    os.remove('dataOutput/PredatorStat.txt')
     main()
